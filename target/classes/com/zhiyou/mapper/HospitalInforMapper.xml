@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zhiyou.mapper.HospitalInforMapper" >
+  <resultMap id="BaseResultMap" type="com.zhiyou.model.HospitalInfor" >
+    <result column="medical_record" property="medicalRecord" jdbcType="VARCHAR" />
+    <result column="caregiver" property="caregiver" jdbcType="VARCHAR" />
+    <result column="bed_id" property="bedId" jdbcType="VARCHAR" />
+    <result column="pay_the_deposit" property="payTheDeposit" jdbcType="DOUBLE" />
+    <result column="state_illness" property="stateIllness" jdbcType="VARCHAR" />
+    <result column="time" property="time"/>
+    <association property="section" javaType="com.zhiyou.model.Section">
+     <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="seccp_num" property="seccpNum" jdbcType="VARCHAR" />
+    <result column="secco_name" property="seccoName" jdbcType="VARCHAR" />
+    </association>
+    <association property="doctor" javaType="com.zhiyou.model.Doctor">
+     <result column="name1" property="name" jdbcType="VARCHAR" />
+    </association>
+    <association property="registrationInfor" javaType="com.zhiyou.model.RegistrationInfor">
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="certificate_type" property="certificateType" jdbcType="VARCHAR" />
+    <result column="ID_num" property="idNum" jdbcType="VARCHAR" />
+    <result column="social_safe_num" property="socialSafeNum" jdbcType="VARCHAR" />
+    <result column="phone" property="phone" jdbcType="VARCHAR" />
+    <result column="self_paying" property="selfPaying" jdbcType="INTEGER" />
+    <result column="sex" property="sex" jdbcType="INTEGER" />
+    <result column="career" property="career" jdbcType="VARCHAR" />
+    <result column="early_appointment" property="earlyAppointment" jdbcType="VARCHAR" />
+    <result column="doctor_id" property="doctorId" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="VARCHAR" />
+    <result column="noted" property="noted" jdbcType="VARCHAR" />
+    <result column="time" property="time" jdbcType="TIMESTAMP" />
+    <result column="section_id" property="sectionId" jdbcType="INTEGER" />
+    <result column="age" property="age" jdbcType="INTEGER" />
+    <result column="registration_fee" property="registrationFee" jdbcType="DOUBLE" />
+    </association>
+  </resultMap>
+  
+  	<select id="getAllHospitalInfor" resultMap="BaseResultMap" parameterType="Map">
+  	select 
+	h.medical_record,h.caregiver,h.bed_id,
+	h.pay_the_deposit,h.state_illness,h.time,
+	s.secco_name,
+	r.name,r.phone,r.status,
+	d.name name1
+	from 
+	hospital_infor h,
+	section s,
+	registration_infor r,
+	doctor d 
+	where h.medical_record=r.medical_record and r.section_id=s.id
+	and r.doctor_id=d.id
+	<if test="medicalRecord != '' and medicalRecord != null">
+	and h.medical_record like '%${medicalRecord}%'
+	</if>
+	<if test="name != '' and name != null">
+	and d.name like '%${name}%'
+	</if>
+	<if test="seccoName != '' and seccoName != null">
+	and s.secco_name like '%${seccoName}%'
+	</if>
+	<if test="time != '' and time != null">
+	and h.time >= #{time}
+	</if>
+	<if test="endtime != null and endtime !=''">
+          and h.time&lt;=#{endtime} 
+         </if>
+  	</select>
+  	
+  	<select id="getHospital" resultMap="BaseResultMap" parameterType="Map">
+  	select * from hospital_infor where medical_record=#{medicalRecord}
+  	</select>
+  	
+  	
+  <insert id="insert" parameterType="com.zhiyou.model.HospitalInfor" >
+    insert into hospital_infor (medical_record, caregiver, bed_id, 
+      pay_the_deposit, state_illness)
+    values (#{medicalRecord,jdbcType=VARCHAR}, #{caregiver,jdbcType=VARCHAR}, #{bedId,jdbcType=VARCHAR}, 
+      #{payTheDeposit,jdbcType=DOUBLE}, #{stateIllness,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zhiyou.model.HospitalInfor" >
+    insert into hospital_infor
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="medicalRecord != null" >
+        medical_record,
+      </if>
+      <if test="caregiver != null" >
+        caregiver,
+      </if>
+      <if test="bedId != null" >
+        bed_id,
+      </if>
+      <if test="payTheDeposit != null" >
+        pay_the_deposit,
+      </if>
+      <if test="stateIllness != null" >
+        state_illness,
+      </if>
+      <if test="time != null" >
+        time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="medicalRecord != null" >
+        #{medicalRecord,jdbcType=VARCHAR},
+      </if>
+      <if test="caregiver != null" >
+        #{caregiver,jdbcType=VARCHAR},
+      </if>
+      <if test="bedId != null" >
+        #{bedId,jdbcType=VARCHAR},
+      </if>
+      <if test="payTheDeposit != null" >
+        #{payTheDeposit,jdbcType=DOUBLE},
+      </if>
+      <if test="stateIllness != null" >
+        #{stateIllness,jdbcType=VARCHAR},
+      </if>
+      <if test="time != null" >
+        #{time}
+      </if>
+    </trim>
+  </insert>
+  
+  <update id="updateHospitalInfor" parameterType="hospitalInfor">
+  	update hospital_infor set medical_record=#{medicalRecord},caregiver=#{caregiver},bed_id=#{bedId},
+  	pay_the_deposit=#{payTheDeposit},state_illness=#{stateIllness} where medical_record =#{medicalRecord}
+  </update>
+  
+</mapper>
